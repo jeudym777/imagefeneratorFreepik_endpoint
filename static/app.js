@@ -5,37 +5,209 @@ let uploadedFiles = [];
 let lastZipBlob = null;
 let currentKnowledgeTab = "brand";
 
-// DOM refs
-const form = document.getElementById("campaign-form");
-const companyInput = document.getElementById("company_name");
-const ejesInput = document.getElementById("ejes");
-const quantitySlider = document.getElementById("quantity");
-const qtyDisplay = document.getElementById("qty-display");
-const styleSelect = document.getElementById("style");
-const brandFilesInput = document.getElementById("brand-files");
-const fileBrowse = document.getElementById("file-browse");
-const fileDropZone = document.getElementById("file-drop-zone");
-const fileList = document.getElementById("file-list");
-const btnGenerate = document.getElementById("btn-generate");
+// Variables globales para DOM
+let form, companyInput, ejesInput, quantitySlider, qtyDisplay, styleSelect;
+let brandFilesInput, fileBrowse, fileDropZone, fileList, btnGenerate;
+let formSection, progressSection, progressFill, progressText, resultsSection, gallery;
+let btnDownload, btnNew;
+let knowledgeModal, btnEditKnowledge, closeModal, tabButtons, knowledgeContent;
+let saveKnowledge, cancelKnowledge;
 
-const formSection = document.getElementById("form-section");
-const progressSection = document.getElementById("progress-section");
-const progressFill = document.getElementById("progress-fill");
-const progressText = document.getElementById("progress-text");
-const resultsSection = document.getElementById("results-section");
-const gallery = document.getElementById("gallery");
-const btnDownload = document.getElementById("btn-download");
-const btnNew = document.getElementById("btn-new");
+// Inicializar cuando el DOM está listo
+document.addEventListener("DOMContentLoaded", function() {
+    // DOM refs
+    form = document.getElementById("campaign-form");
+    companyInput = document.getElementById("company_name");
+    ejesInput = document.getElementById("ejes");
+    quantitySlider = document.getElementById("quantity");
+    qtyDisplay = document.getElementById("qty-display");
+    styleSelect = document.getElementById("style");
+    brandFilesInput = document.getElementById("brand-files");
+    fileBrowse = document.getElementById("file-browse");
+    fileDropZone = document.getElementById("file-drop-zone");
+    fileList = document.getElementById("file-list");
+    btnGenerate = document.getElementById("btn-generate");
 
-// Knowledge modal refs
-const knowledgeModal = document.getElementById("knowledge-modal");
-const btnEditKnowledge = document.getElementById("btn-edit-knowledge");
-const closeModal = document.getElementById("close-modal");
-const tabButtons = document.querySelectorAll(".tab-btn");
-const knowledgeContent = document.getElementById("knowledge-content");
-const saveKnowledge = document.getElementById("save-knowledge");
-const cancelKnowledge = document.getElementById("cancel-knowledge");
+    formSection = document.getElementById("form-section");
+    progressSection = document.getElementById("progress-section");
+    progressFill = document.getElementById("progress-fill");
+    progressText = document.getElementById("progress-text");
+    resultsSection = document.getElementById("results-section");
+    gallery = document.getElementById("gallery");
+    btnDownload = document.getElementById("btn-download");
+    btnNew = document.getElementById("btn-new");
 
+    // Knowledge modal refs
+    knowledgeModal = document.getElementById("knowledge-modal");
+    btnEditKnowledge = document.getElementById("btn-edit-knowledge");
+    closeModal = document.getElementById("close-modal");
+    tabButtons = document.querySelectorAll(".tab-btn");
+    knowledgeContent = document.getElementById("knowledge-content");
+    saveKnowledge = document.getElementById("save-knowledge");
+    cancelKnowledge = document.getElementById("cancel-knowledge");
+
+    // Verificar que los elementos existan
+    if (!btnEditKnowledge) {
+        console.error("btn-edit-knowledge no encontrado");
+        return;
+    }
+
+    // Cargar estilos
+    loadStyles();
+    
+    // Agregar event listeners
+    setupEventListeners();
+});
+
+function setupEventListeners() {
+    // Modal event listeners
+    btnEditKnowledge.addEventListener("click", () => {
+        knowledgeModal.classList.remove("hidden");
+        loadKnowledge("brand");
+    });
+
+    closeModal.addEventListener("click", () => {
+        knowledgeModal.classList.add("hidden");
+    });
+
+    knowledgeModal.addEventListener("click", (e) => {
+        if (e.target === knowledgeModal) {
+            knowledgeModal.classList.add("hidden");
+        }
+    });
+
+    tabButtons.forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+            tabButtons.forEach((b) => b.classList.remove("active"));
+            e.target.classList.add("active");
+            const tabType = e.target.dataset.tab;
+            loadKnowledge(tabType);
+        });
+    });
+
+    saveKnowledge.addEventListener("click", saveKnowledgeContent);
+
+    cancelKnowledge.addEventListener("click", () => {
+        knowledgeModal.classList.add("hidden");
+    });
+
+    // Slider
+    quantitySlider.addEventListener("input", () => {
+        qtyDisplay.textContent = quantitySlider.value;
+    });
+
+    // File upload
+    fileBrowse.addEventListener("click", (e) => {
+        e.preventDefault();
+        brandFilesInput.click();
+    });
+
+    fileDropZone.addEventListener("click", (e) => {
+        if (e.target === fileDropZone || e.target.closest("p")) {
+            brandFilesInput.click();
+        }
+    });
+
+    fileDropZone.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        fileDropZone.classList.add("drag-over");
+    });
+
+    fileDropZone.addEventListener("dragleave", () => {
+        fileDropZone.classList.remove("drag-over");
+    });
+
+    fileDropZone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        fileDropZone.classList.remove("drag-over");
+        handleFiles(e.dataTransfer.files);
+    });
+
+    brandFilesInput.addEventListener("change", () => {
+        handleFiles(brandFilesInput.files);
+    });
+
+    // Formulario
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const companyName = companyInput.value.trim();
+        const ejes = ejesInput.value.trim();
+        const quantity = parseInt(quantitySlider.value);
+        const style = styleSelect.value || undefined;
+
+        if (!companyName || !ejes) return;
+
+        formSection.classList.add("hidden");
+        resultsSection.classList.add("hidden");
+        progressSection.classList.remove("hidden");
+        progressFill.style.width = "5%";
+
+        const interval = simulateProgress(5);
+
+        try {
+            await uploadKnowledgeFiles();
+
+            const body = {
+                company_name: companyName,
+                ejes: ejes,
+                quantity: quantity,
+                session_id: sessionId,
+            };
+            if (style) body.style = style;
+
+            const res = await fetch(`${API_BASE}/api/generate-campaign`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(body),
+            });
+
+            if (!res.ok) {
+                throw new Error(`Error ${res.status}: ${await res.text()}`);
+            }
+
+            lastZipBlob = await res.blob();
+
+            clearInterval(interval);
+            progressFill.style.width = "100%";
+            progressText.textContent = "Campaña generada.";
+
+            await displayResults(lastZipBlob);
+
+            setTimeout(() => {
+                progressSection.classList.add("hidden");
+                resultsSection.classList.remove("hidden");
+            }, 600);
+        } catch (err) {
+            clearInterval(interval);
+            progressSection.classList.add("hidden");
+            formSection.classList.remove("hidden");
+            alert("Error generando la campaña: " + err.message);
+        }
+    });
+
+    // Botones de resultados
+    btnDownload.addEventListener("click", () => {
+        const url = URL.createObjectURL(lastZipBlob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `campana_${new Date().getTime()}.zip`;
+        a.click();
+        URL.revokeObjectURL(url);
+    });
+
+    btnNew.addEventListener("click", () => {
+        formSection.classList.remove("hidden");
+        resultsSection.classList.add("hidden");
+        progressSection.classList.add("hidden");
+        form.reset();
+        sessionId = crypto.randomUUID();
+        uploadedFiles = [];
+        renderFileList();
+    });
+}
+
+// Resto de funciones
 // Init: load styles
 async function loadStyles() {
     try {
@@ -74,80 +246,13 @@ async function saveKnowledgeContent() {
             body: JSON.stringify({ content: knowledgeContent.value })
         });
         if (!res.ok) throw new Error("Error saving knowledge");
-        alert("✅ Cambios guardados exitosamente");
+        alert("Cambios guardados exitosamente");
         knowledgeModal.classList.add("hidden");
     } catch (e) {
         console.error("Error saving knowledge:", e);
-        alert("❌ Error al guardar los cambios");
+        alert("Error al guardar los cambios");
     }
 }
-
-// Modal event listeners
-btnEditKnowledge.addEventListener("click", () => {
-    knowledgeModal.classList.remove("hidden");
-    loadKnowledge("brand");
-});
-
-closeModal.addEventListener("click", () => {
-    knowledgeModal.classList.add("hidden");
-});
-
-knowledgeModal.addEventListener("click", (e) => {
-    if (e.target === knowledgeModal) {
-        knowledgeModal.classList.add("hidden");
-    }
-});
-
-tabButtons.forEach((btn) => {
-    btn.addEventListener("click", (e) => {
-        tabButtons.forEach((b) => b.classList.remove("active"));
-        e.target.classList.add("active");
-        const tabType = e.target.dataset.tab;
-        loadKnowledge(tabType);
-    });
-});
-
-saveKnowledge.addEventListener("click", saveKnowledgeContent);
-
-cancelKnowledge.addEventListener("click", () => {
-    knowledgeModal.classList.add("hidden");
-});
-
-// Slider
-quantitySlider.addEventListener("input", () => {
-    qtyDisplay.textContent = quantitySlider.value;
-});
-
-// File upload
-fileBrowse.addEventListener("click", (e) => {
-    e.preventDefault();
-    brandFilesInput.click();
-});
-
-fileDropZone.addEventListener("click", (e) => {
-    if (e.target === fileDropZone || e.target.closest("p")) {
-        brandFilesInput.click();
-    }
-});
-
-fileDropZone.addEventListener("dragover", (e) => {
-    e.preventDefault();
-    fileDropZone.classList.add("drag-over");
-});
-
-fileDropZone.addEventListener("dragleave", () => {
-    fileDropZone.classList.remove("drag-over");
-});
-
-fileDropZone.addEventListener("drop", (e) => {
-    e.preventDefault();
-    fileDropZone.classList.remove("drag-over");
-    handleFiles(e.dataTransfer.files);
-});
-
-brandFilesInput.addEventListener("change", () => {
-    handleFiles(brandFilesInput.files);
-});
 
 function handleFiles(files) {
     for (const f of files) {
@@ -164,7 +269,7 @@ function renderFileList() {
     fileList.innerHTML = "";
     uploadedFiles.forEach((f, i) => {
         const li = document.createElement("li");
-        li.innerHTML = `<span>📄 ${f.name} (${(f.size / 1024).toFixed(1)} KB)</span>
+        li.innerHTML = `<span><i class="fas fa-file-alt"></i> ${f.name} (${(f.size / 1024).toFixed(1)} KB)</span>
             <button class="remove-file" data-idx="${i}">✕</button>`;
         fileList.appendChild(li);
     });

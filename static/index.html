@@ -4,16 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CreativoyeooAgent - Generador de Campañas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header>
         <div class="logo">
-            <span class="logo-icon">⚡</span>
+            <i class="fas fa-bolt icon-logo"></i>
             <h1>Creativo<span class="accent">yeoo</span>Agent</h1>
         </div>
         <p class="subtitle">Generador de Campañas Publicitarias con IA</p>
-        <button id="btn-edit-knowledge" class="btn-settings" title="Editar Base de Conocimiento">⚙️ Configurar Agente</button>
+        <button id="btn-edit-knowledge" class="btn-settings" title="Editar Base de Conocimiento"><i class="fas fa-sliders-h"></i> Configurar Agente</button>
     </header>
 
     <main>
@@ -47,13 +48,13 @@
                     <label>Documentos de Marca (opcional)</label>
                     <div class="file-upload" id="file-drop-zone">
                         <input type="file" id="brand-files" multiple accept=".md,.txt" hidden>
-                        <p>📄 Arrastra archivos .md o .txt aquí o <a href="#" id="file-browse">selecciona</a></p>
+                        <p><i class="fas fa-file-alt"></i> Arrastra archivos .md o .txt aquí o <a href="#" id="file-browse">selecciona</a></p>
                         <ul id="file-list"></ul>
                     </div>
                 </div>
 
                 <button type="submit" id="btn-generate" class="btn-primary">
-                    🚀 Generar Campaña
+                    <i class="fas fa-rocket"></i> Generar Campaña
                 </button>
             </form>
         </section>
@@ -72,10 +73,10 @@
         <section class="card hidden" id="results-section">
             <div class="results-header">
                 <h2>Resultados</h2>
-                <button class="btn-primary" id="btn-download">📦 Descargar ZIP</button>
+                <button class="btn-primary" id="btn-download"><i class="fas fa-download"></i> Descargar ZIP</button>
             </div>
             <div class="gallery" id="gallery"></div>
-            <button class="btn-secondary" id="btn-new">+ Nueva Campaña</button>
+            <button class="btn-secondary" id="btn-new"><i class="fas fa-plus"></i> Nueva Campaña</button>
         </section>
     </main>
 
@@ -87,14 +88,14 @@
                 <button id="close-modal" class="close-btn">&times;</button>
             </div>
             <div class="modal-tabs">
-                <button class="tab-btn active" data-tab="brand">🏢 Agente Brand</button>
-                <button class="tab-btn" data-tab="copywriter">✍️ Agente Escritor Creativo</button>
-                <button class="tab-btn" data-tab="designer">🎨 Agente Diseñador Creativo</button>
+                <button class="tab-btn active" data-tab="brand"><i class="fas fa-building"></i> Agente Brand</button>
+                <button class="tab-btn" data-tab="copywriter"><i class="fas fa-pen-fancy"></i> Agente Escritor Creativo</button>
+                <button class="tab-btn" data-tab="designer"><i class="fas fa-palette"></i> Agente Diseñador Creativo</button>
             </div>
             <div class="modal-body">
                 <textarea id="knowledge-content" placeholder="Edita el contenido aquí..." class="knowledge-editor"></textarea>
                 <div class="modal-actions">
-                    <button id="save-knowledge" class="btn-primary">💾 Guardar Cambios</button>
+                    <button id="save-knowledge" class="btn-primary"><i class="fas fa-save"></i> Guardar Cambios</button>
                     <button id="cancel-knowledge" class="btn-secondary">Cancelar</button>
                 </div>
             </div>
