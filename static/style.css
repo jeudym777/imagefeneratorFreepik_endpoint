@@ -154,6 +154,66 @@ input[type="range"]::-moz-range-thumb {
     border: none;
 }
 
+/* Info tooltip */
+.info-tooltip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    margin-left: 0.5rem;
+    background: rgba(74,154,245,0.2);
+    border-radius: 50%;
+    color: var(--blue-light);
+    cursor: help;
+    font-size: 0.75rem;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.info-tooltip:hover {
+    background: rgba(74,154,245,0.4);
+    transform: scale(1.1);
+}
+
+.info-tooltip i {
+    font-size: 0.9rem;
+}
+
+/* Tooltip text on hover */
+.info-tooltip[title] {
+    position: relative;
+}
+
+.info-tooltip[title]:hover::after {
+    content: attr(title);
+    position: absolute;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg-secondary);
+    color: var(--white);
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: normal;
+    white-space: nowrap;
+    z-index: 100;
+    border: 1px solid rgba(74,154,245,0.3);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+}
+
+.info-tooltip[title]:hover::before {
+    content: "";
+    position: absolute;
+    bottom: 115%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: var(--bg-secondary);
+    z-index: 100;
+}
+
 /* File upload */
 .file-upload {
     border: 2px dashed rgba(255,255,255,0.15);

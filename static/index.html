@@ -33,8 +33,12 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="quantity">Cantidad de Piezas: <span id="qty-display">5</span></label>
-                    <input type="range" id="quantity" min="1" max="20" value="5">
+                    <label for="quantity">Cantidad de Piezas: <span id="qty-display">5</span>
+                        <span class="info-tooltip" title="El límite actual es 5. Puede aumentarse hasta +100 imágenes/frases. Está reducido por costos de API.">
+                            <i class="fas fa-circle-question"></i>
+                        </span>
+                    </label>
+                    <input type="range" id="quantity" min="1" max="5" value="5">
                 </div>
 
                 <div class="form-group">
