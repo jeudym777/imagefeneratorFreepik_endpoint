@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CreativoyeooAgent - Generador de Campañas</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <span class="logo-icon">⚡</span>
+            <h1>Creativo<span class="accent">yeoo</span>Agent</h1>
+        </div>
+        <p class="subtitle">Generador de Campañas Publicitarias con IA</p>
+    </header>
+
+    <main>
+        <!-- Formulario -->
+        <section class="card" id="form-section">
+            <h2>Nueva Campaña</h2>
+            <form id="campaign-form">
+                <div class="form-group">
+                    <label for="company_name">Nombre de la Empresa</label>
+                    <input type="text" id="company_name" placeholder="Ej: Yeoo Software" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="ejes">Ejes Temáticos</label>
+                    <textarea id="ejes" rows="3" placeholder="Ej: innovación tecnológica, transformación digital, soluciones empresariales" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="quantity">Cantidad de Piezas: <span id="qty-display">5</span></label>
+                    <input type="range" id="quantity" min="1" max="20" value="5">
+                </div>
+
+                <div class="form-group">
+                    <label for="style">Estilo Visual</label>
+                    <select id="style">
+                        <option value="">Automático (variado)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Documentos de Marca (opcional)</label>
+                    <div class="file-upload" id="file-drop-zone">
+                        <input type="file" id="brand-files" multiple accept=".md,.txt" hidden>
+                        <p>📄 Arrastra archivos .md o .txt aquí o <a href="#" id="file-browse">selecciona</a></p>
+                        <ul id="file-list"></ul>
+                    </div>
+                </div>
+
+                <button type="submit" id="btn-generate" class="btn-primary">
+                    🚀 Generar Campaña
+                </button>
+            </form>
+        </section>
+
+        <!-- Progreso -->
+        <section class="card hidden" id="progress-section">
+            <h2>Generando Campaña...</h2>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <p id="progress-text">Buscando información de la empresa...</p>
+            <div class="spinner"></div>
+        </section>
+
+        <!-- Resultados -->
+        <section class="card hidden" id="results-section">
+            <div class="results-header">
+                <h2>Resultados</h2>
+                <button class="btn-primary" id="btn-download">📦 Descargar ZIP</button>
+            </div>
+            <div class="gallery" id="gallery"></div>
+            <button class="btn-secondary" id="btn-new">+ Nueva Campaña</button>
+        </section>
+    </main>
+
+    <footer>
+        <p>Powered by <span class="accent">Yeoo Software</span> · OpenAI · Freepik AI</p>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>
