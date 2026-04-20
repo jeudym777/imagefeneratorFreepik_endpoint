@@ -62,6 +62,25 @@ header h1 {
     font-size: 0.95rem;
 }
 
+/* Hero Section */
+.hero {
+    width: 100%;
+    overflow: hidden;
+    background: var(--bg-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+}
+
+.hero-image {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+    max-height: 600px;
+}
+
 /* Main */
 main {
     max-width: 900px;
