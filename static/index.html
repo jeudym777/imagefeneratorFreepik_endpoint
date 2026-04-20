@@ -13,6 +13,7 @@
             <h1>Creativo<span class="accent">yeoo</span>Agent</h1>
         </div>
         <p class="subtitle">Generador de Campañas Publicitarias con IA</p>
+        <button id="btn-edit-knowledge" class="btn-settings" title="Editar Base de Conocimiento">⚙️ Configurar Agente</button>
     </header>
 
     <main>
@@ -77,6 +78,28 @@
             <button class="btn-secondary" id="btn-new">+ Nueva Campaña</button>
         </section>
     </main>
+
+    <!-- Modal de edición de conocimiento -->
+    <div id="knowledge-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Configurar Agente Creativo</h2>
+                <button id="close-modal" class="close-btn">&times;</button>
+            </div>
+            <div class="modal-tabs">
+                <button class="tab-btn active" data-tab="brand">🏢 Agente Brand</button>
+                <button class="tab-btn" data-tab="copywriter">✍️ Agente Escritor Creativo</button>
+                <button class="tab-btn" data-tab="designer">🎨 Agente Diseñador Creativo</button>
+            </div>
+            <div class="modal-body">
+                <textarea id="knowledge-content" placeholder="Edita el contenido aquí..." class="knowledge-editor"></textarea>
+                <div class="modal-actions">
+                    <button id="save-knowledge" class="btn-primary">💾 Guardar Cambios</button>
+                    <button id="cancel-knowledge" class="btn-secondary">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <footer>
         <p>Powered by <span class="accent">Yeoo Software</span> · OpenAI · Freepik AI</p>

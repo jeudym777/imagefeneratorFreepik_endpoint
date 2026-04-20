@@ -3,6 +3,7 @@ const API_BASE = window.location.origin;
 let sessionId = crypto.randomUUID();
 let uploadedFiles = [];
 let lastZipBlob = null;
+let currentKnowledgeTab = "brand";
 
 // DOM refs
 const form = document.getElementById("campaign-form");
@@ -26,6 +27,15 @@ const gallery = document.getElementById("gallery");
 const btnDownload = document.getElementById("btn-download");
 const btnNew = document.getElementById("btn-new");
 
+// Knowledge modal refs
+const knowledgeModal = document.getElementById("knowledge-modal");
+const btnEditKnowledge = document.getElementById("btn-edit-knowledge");
+const closeModal = document.getElementById("close-modal");
+const tabButtons = document.querySelectorAll(".tab-btn");
+const knowledgeContent = document.getElementById("knowledge-content");
+const saveKnowledge = document.getElementById("save-knowledge");
+const cancelKnowledge = document.getElementById("cancel-knowledge");
+
 // Init: load styles
 async function loadStyles() {
     try {
@@ -41,6 +51,67 @@ async function loadStyles() {
         console.error("Error loading styles:", e);
     }
 }
+
+// Knowledge Management
+async function loadKnowledge(type) {
+    try {
+        const res = await fetch(`${API_BASE}/api/knowledge/${type}`);
+        if (!res.ok) throw new Error("Error loading knowledge");
+        const data = await res.json();
+        knowledgeContent.value = data.content || "";
+        currentKnowledgeTab = type;
+    } catch (e) {
+        console.error(`Error loading ${type} knowledge:`, e);
+        knowledgeContent.value = "";
+    }
+}
+
+async function saveKnowledgeContent() {
+    try {
+        const res = await fetch(`${API_BASE}/api/knowledge/${currentKnowledgeTab}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ content: knowledgeContent.value })
+        });
+        if (!res.ok) throw new Error("Error saving knowledge");
+        alert("✅ Cambios guardados exitosamente");
+        knowledgeModal.classList.add("hidden");
+    } catch (e) {
+        console.error("Error saving knowledge:", e);
+        alert("❌ Error al guardar los cambios");
+    }
+}
+
+// Modal event listeners
+btnEditKnowledge.addEventListener("click", () => {
+    knowledgeModal.classList.remove("hidden");
+    loadKnowledge("brand");
+});
+
+closeModal.addEventListener("click", () => {
+    knowledgeModal.classList.add("hidden");
+});
+
+knowledgeModal.addEventListener("click", (e) => {
+    if (e.target === knowledgeModal) {
+        knowledgeModal.classList.add("hidden");
+    }
+});
+
+tabButtons.forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+        tabButtons.forEach((b) => b.classList.remove("active"));
+        e.target.classList.add("active");
+        const tabType = e.target.dataset.tab;
+        loadKnowledge(tabType);
+    });
+});
+
+saveKnowledge.addEventListener("click", saveKnowledgeContent);
+
+cancelKnowledge.addEventListener("click", () => {
+    knowledgeModal.classList.add("hidden");
+});
 
 // Slider
 quantitySlider.addEventListener("input", () => {
