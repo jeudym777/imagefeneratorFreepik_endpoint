@@ -1,4 +1,4 @@
-const API_BASE = "https://imagefeneratorfreepik-endpoint-production.up.railway.app";
+const API_BASE = window.location.origin;
 
 let sessionId = crypto.randomUUID();
 let uploadedFiles = [];
