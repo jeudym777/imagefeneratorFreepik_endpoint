@@ -1,0 +1,75 @@
+{
+  "name": "CreativoAgent - Campaign Generator",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "generate-campaign",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "webhook_trigger",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [100, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://imagefeneratorfreepik-endpoint-production.up.railway.app/api/generate-campaign",
+        "requestMethod": "POST",
+        "contentType": "application/json",
+        "bodyParametersUi": "keyvalue",
+        "bodyParameters": [
+          {
+            "name": "company_name",
+            "value": "={{ $json.company_name }}"
+          },
+          {
+            "name": "ejes",
+            "value": "={{ $json.ejes }}"
+          },
+          {
+            "name": "quantity",
+            "value": "={{ $json.quantity || 2 }}"
+          },
+          {
+            "name": "style",
+            "value": "={{ $json.style || 'photo' }}"
+          },
+          {
+            "name": "session_id",
+            "value": "={{ $json.session_id }}"
+          }
+        ],
+        "options": {}
+      },
+      "id": "http_request",
+      "name": "Call API - Generate Campaign",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [300, 300]
+    }
+  ],
+  "connections": {
+    "webhook_trigger": {
+      "main": [
+        [
+          {
+            "node": "http_request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1",
+  "meta": {
+    "instanceId": "n8n-workflow"
+  },
+  "pinData": null
+}
