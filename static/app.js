@@ -52,6 +52,13 @@ document.addEventListener("DOMContentLoaded", function() {
         return;
     }
 
+    // Overlay toggle
+    const overlayCheck = document.getElementById("overlay-check");
+    const overlayColors = document.getElementById("overlay-colors");
+    overlayCheck.addEventListener("change", () => {
+        overlayColors.classList.toggle("hidden", !overlayCheck.checked);
+    });
+
     // Cargar estilos
     loadStyles();
     
@@ -407,15 +414,30 @@ async function displayResults(blob) {
 
         const imgFile = zip.file(archivo);
         let imgSrc = "";
+        let compositeImgSrc = "";
         if (imgFile) {
             const imgData = await imgFile.async("base64");
             imgSrc = `data:image/png;base64,${imgData}`;
+            const overlayCheck = document.getElementById("overlay-check");
+            if (overlayCheck && overlayCheck.checked) {
+                const colorPrimary = document.getElementById("color-primary").value;
+                const colorAccent = document.getElementById("color-accent").value;
+                compositeImgSrc = await overlayTextOnImage(imgSrc, frase, colorPrimary, colorAccent);
+            }
         }
 
         const item = document.createElement("div");
         item.className = "gallery-item";
         item.innerHTML = `
-            ${imgSrc ? `<img src="${imgSrc}" alt="Imagen ${num}" loading="lazy">` : `<div style="aspect-ratio:1;background:var(--bg-primary);display:flex;align-items:center;justify-content:center;color:var(--gray-dark)">Sin imagen</div>`}
+            ${imgSrc
+                ? `<div class="img-wrapper">
+                    <img src="${compositeImgSrc || imgSrc}" alt="Imagen ${num}" loading="lazy" class="img-composite">
+                    ${compositeImgSrc
+                        ? `<a href="${imgSrc}" download="imagen_${num}_sin_texto.png" class="btn-dl-clean" title="Descargar sin texto"><i class="fas fa-image"></i></a>
+                    <a href="${compositeImgSrc}" download="imagen_${num}_con_texto.png" class="btn-dl-text" title="Descargar con texto"><i class="fas fa-font"></i></a>`
+                        : `<a href="${imgSrc}" download="imagen_${num}.png" class="btn-dl-text" title="Descargar imagen"><i class="fas fa-download"></i></a>`}
+                   </div>`
+                : `<div style="aspect-ratio:1;background:var(--bg-primary);display:flex;align-items:center;justify-content:center;color:var(--gray-dark)">Sin imagen</div>`}
             <div class="item-info">
                 <div class="frase">${escapeHtml(frase)}</div>
                 <div class="meta">
@@ -494,6 +516,88 @@ btnNew.addEventListener("click", () => {
     gallery.innerHTML = "";
     lastZipBlob = null;
 });
+
+// Overlay advertising text on image using Canvas
+function overlayTextOnImage(imgSrc, frase, colorPrimary = "#ffffff", colorAccent = "#b36cff") {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.onload = () => {
+            const canvas = document.createElement("canvas");
+            const W = img.width;
+            const H = img.height;
+            canvas.width = W;
+            canvas.height = H;
+            const ctx = canvas.getContext("2d");
+
+            // Draw original image
+            ctx.drawImage(img, 0, 0, W, H);
+
+            // Dark gradient overlay at bottom-left area
+            const gradH = H * 0.55;
+            const grad = ctx.createLinearGradient(0, H - gradH, 0, H);
+            grad.addColorStop(0, "rgba(0,0,0,0)");
+            grad.addColorStop(0.4, "rgba(0,0,0,0.55)");
+            grad.addColorStop(1, "rgba(0,0,0,0.82)");
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, H - gradH, W, gradH);
+
+            // Typography settings
+            const padding = W * 0.07;
+            const maxWidth = W - padding * 2;
+            const baseFontSize = Math.round(W * 0.085);
+
+            // Split frase into words and wrap lines
+            const words = frase.toUpperCase().split(" ");
+            ctx.font = `900 ${baseFontSize}px 'Arial Black', Arial, sans-serif`;
+            const lines = [];
+            let line = "";
+            for (const word of words) {
+                const test = line ? line + " " + word : word;
+                if (ctx.measureText(test).width > maxWidth && line) {
+                    lines.push(line);
+                    line = word;
+                } else {
+                    line = test;
+                }
+            }
+            if (line) lines.push(line);
+
+            // Reduce font if too many lines
+            let fontSize = baseFontSize;
+            if (lines.length > 4) {
+                fontSize = Math.round(baseFontSize * 0.75);
+                ctx.font = `900 ${fontSize}px 'Arial Black', Arial, sans-serif`;
+            }
+
+            const lineH = fontSize * 1.2;
+            const totalTextH = lines.length * lineH;
+            const startY = H - padding - totalTextH + fontSize;
+
+            // Draw each line: shadow + white text, last word accent colored
+            lines.forEach((ln, i) => {
+                const y = startY + i * lineH;
+                // Shadow
+                ctx.shadowColor = "rgba(0,0,0,0.8)";
+                ctx.shadowBlur = 8;
+                ctx.shadowOffsetX = 2;
+                ctx.shadowOffsetY = 2;
+
+                if (i === lines.length - 1) {
+                    ctx.fillStyle = colorAccent;
+                } else {
+                    ctx.fillStyle = colorPrimary;
+                }
+                ctx.fillText(ln, padding, y);
+            });
+
+            ctx.shadowColor = "transparent";
+            resolve(canvas.toDataURL("image/png"));
+        };
+        img.onerror = () => resolve(imgSrc); // fallback: original
+        img.src = imgSrc;
+    });
+}
 
 // Load JSZip from CDN
 function loadJSZip() {

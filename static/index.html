@@ -58,6 +58,26 @@
                     </div>
                 </div>
 
+                <div class="form-group">
+                    <div class="toggle-row">
+                        <label class="toggle-label" for="overlay-check">
+                            <input type="checkbox" id="overlay-check">
+                            <span class="toggle-slider"></span>
+                            <span class="toggle-text"><i class="fas fa-font"></i> Frase en la imagen</span>
+                        </label>
+                    </div>
+                    <div id="overlay-colors" class="overlay-color-pickers hidden">
+                        <div class="color-picker-row">
+                            <label for="color-primary">Texto principal</label>
+                            <input type="color" id="color-primary" value="#ffffff">
+                        </div>
+                        <div class="color-picker-row">
+                            <label for="color-accent">Texto secundario (último renglón)</label>
+                            <input type="color" id="color-accent" value="#b36cff">
+                        </div>
+                    </div>
+                </div>
+
                 <button type="submit" id="btn-generate" class="btn-primary">
                     Generar Campaña
                 </button>

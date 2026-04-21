@@ -417,6 +417,47 @@ input[type="range"]::-moz-range-thumb {
     display: block;
 }
 
+/* Image wrapper with overlay download buttons */
+.img-wrapper {
+    position: relative;
+    overflow: hidden;
+}
+
+.img-wrapper .img-composite {
+    width: 100%;
+    display: block;
+}
+
+.img-wrapper .btn-dl-clean,
+.img-wrapper .btn-dl-text {
+    position: absolute;
+    top: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+    font-size: 0.8rem;
+    text-decoration: none;
+    opacity: 0;
+    transition: opacity 0.2s, background 0.2s;
+    backdrop-filter: blur(4px);
+}
+
+.img-wrapper .btn-dl-clean { right: 48px; }
+.img-wrapper .btn-dl-text  { right: 10px; }
+
+.img-wrapper:hover .btn-dl-clean,
+.img-wrapper:hover .btn-dl-text {
+    opacity: 1;
+}
+
+.img-wrapper .btn-dl-clean:hover { background: rgba(179,108,255,0.85); }
+.img-wrapper .btn-dl-text:hover  { background: rgba(244,180,0,0.85); color: #000; }
+
 .gallery-item .item-info {
     padding: 1rem;
 }
@@ -459,6 +500,113 @@ input[type="range"]::-moz-range-thumb {
 /* Utility */
 .hidden {
     display: none !important;
+}
+
+/* Overlay toggle row */
+.toggle-row {
+    display: flex;
+    align-items: center;
+    padding: 0.65rem 0.9rem;
+    background: rgba(179,108,255,0.08);
+    border: 1.5px solid rgba(179,108,255,0.25);
+    border-radius: 10px;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.toggle-row:has(input:checked) {
+    background: rgba(179,108,255,0.15);
+    border-color: rgba(179,108,255,0.55);
+}
+
+.toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    user-select: none;
+    width: 100%;
+}
+
+.toggle-label input[type="checkbox"] {
+    display: none;
+}
+
+.toggle-slider {
+    width: 46px;
+    height: 26px;
+    background: rgba(255,255,255,0.1);
+    border: 1.5px solid rgba(255,255,255,0.25);
+    border-radius: 999px;
+    position: relative;
+    flex-shrink: 0;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.toggle-slider::after {
+    content: "";
+    position: absolute;
+    left: 4px;
+    top: 4px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.45);
+    transition: transform 0.2s, background 0.2s;
+}
+
+.toggle-label input[type="checkbox"]:checked + .toggle-slider {
+    background: rgba(179,108,255,0.4);
+    border-color: #b36cff;
+}
+
+.toggle-label input[type="checkbox"]:checked + .toggle-slider::after {
+    transform: translateX(20px);
+    background: #b36cff;
+    box-shadow: 0 0 6px rgba(179,108,255,0.8);
+}
+
+.toggle-text {
+    color: #fff;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.toggle-text i {
+    color: #b36cff;
+    font-size: 0.9rem;
+}
+
+.overlay-color-pickers {
+    margin-top: 0.9rem;
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    padding: 0.8rem 1rem;
+    background: rgba(255,255,255,0.04);
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.07);
+}
+
+.color-picker-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--gray-light);
+}
+
+.color-picker-row input[type="color"] {
+    width: 36px;
+    height: 28px;
+    border: none;
+    border-radius: 6px;
+    background: none;
+    cursor: pointer;
+    padding: 1px;
 }
 
 /* Footer */
